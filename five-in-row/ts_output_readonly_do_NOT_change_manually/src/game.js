@@ -12,7 +12,8 @@ var game;
     game.boardBeforeMove = null;
     game.moveToConfirm = null;
     game.delta = null;
-    game.score = { white: " ", black: " " };
+    game.posJustCapturedForKo = null;
+    game.score = { white: 0, black: 0 };
     // For community games.
     game.playerIdToProposal = null;
     game.proposals = null;
@@ -54,7 +55,46 @@ var game;
                 "hi": "बंद करे",
                 "es": "Cerrar"
             },
-           
+            "MODAL_BODY_AGREE_WITH_DEAD": {
+                "en": "Your opponent marked all dead stones, which appear smaller and blinking.\nIf you agree, click Agree and the game will end.\nIf you disagree, click Continue playing and then make your move.\n",
+                "iw": "היריב שלך מסומן כל האבנים המתות, אשר מופיעות קטן מהבהבת.\nאם אתה מסכים, לחץ על סכם המשחק יסתיים.\nאם אינך מסכים, לחץ על המשך לשחק ואז לעשות את הצעד הבא שלך.\n",
+                "pt": "Seu oponente marcado todas as pedras mortas, que aparecem menor e piscando.\nSe você concordar, clique em Concordo e o jogo terminará.\nSe você não concordar, clique em Continuar a jogar e, em seguida, fazer a sua jogada.\n",
+                "zh": "你的对手标记都死了块石头，看起来更小和闪烁。\n如果您同意，请单击同意，游戏将结束。\n如果您不同意，请点击继续玩，然后让你的举动。\n",
+                "el": "Ο αντίπαλός σας επισημαίνονται όλα τα νεκρά πέτρες, οι οποίες εμφανίζονται μικρότερα και αναβοσβήνει.\nΕάν συμφωνείτε, κάντε κλικ στο κουμπί Αποδοχή και το παιχνίδι θα τελειώσει.\nΑν διαφωνείτε, κάντε κλικ στην επιλογή Συνέχεια παιχνιδιού και στη συνέχεια να κάνετε την κίνηση σας.\n",
+                "fr": "Votre adversaire a marqué toutes les pierres mortes, qui apparaissent plus petits et clignote.\nSi vous êtes d'accord, cliquez sur Accepter et le jeu se terminera.\nSi vous n'êtes pas d'accord, cliquez sur Continuer à jouer et ensuite faire votre déménagement.\n",
+                "hi": "अपने प्रतिद्वंद्वी को सभी मृत पत्थर है, जो छोटे और निमिष दिखाई चिह्नित।\nअगर आप सहमत हैं, सहमत क्लिक करें और खेल खत्म हो जाएगा।\nयदि आप असहमत हैं, खेल जारी रखने के लिए क्लिक करें और फिर अपनी चाल बनाओ।\n",
+                "es": "Su oponente marcó todas las piedras muertas, que aparecen más pequeño y parpadeando.\nSi está de acuerdo, haga clic en Aceptar y el juego terminará.\nSi no está de acuerdo, haga clic en Continuar de juego y luego hacer su movimiento.\n"
+            },
+            "MODAL_TITLE_AGREE_WITH_DEAD": {
+                "en": "Agree/disagree with dead stone selection",
+                "iw": "מסכים / לא מסכים עם בחירת אבן מתה",
+                "pt": "Concorda / discorda com a seleção de pedra morta",
+                "zh": "同意/死石头的选择不同意",
+                "el": "Συμφωνούν / διαφωνούν με νεκρούς επιλογή πέτρα",
+                "fr": "D'accord / pas d'accord avec la sélection de pierre morte",
+                "hi": "सहमत / मृत पत्थर चयन से असहमत",
+                "es": "De acuerdo / desacuerdo con la selección piedra muerta"
+            },
+            "MODAL_BODY_MARK_DEAD": {
+                "en": "Dead stones will appear smaller and blinking. When you're done, click Confirm.",
+                "iw": "אבני מלח תופענה קטנות מהבהב. כשתסיים, לחץ על אשר.",
+                "pt": "pedras mortas aparece menor e piscando. Quando estiver pronto, clique em Confirmar.",
+                "zh": "死者的石头会出现小和闪烁。当您完成后，点击确认。",
+                "el": "Νεκρά πέτρες θα εμφανιστεί μικρότερα και αναβοσβήνει. Όταν τελειώσετε, κάντε κλικ στο κουμπί Επιβεβαίωση.",
+                "fr": "pierres mortes apparaissent plus petites et clignote. Lorsque vous avez terminé, cliquez sur Confirmer.",
+                "hi": "मृत पत्थर छोटे और निमिष दिखाई देगा। जब आप कर रहे हैं, की पुष्टि करें।",
+                "es": "piedras muertas aparecen más pequeño y parpadeando. Cuando haya terminado, haga clic en Confirmar."
+            },
+            "MODAL_TITLE_MARK_DEAD": {
+                "en": "Mark the dead stones",
+                "iw": "סמן את האבנים מת",
+                "pt": "Marcar as pedras mortas",
+                "zh": "纪念死者的石头",
+                "el": "Επισημάνετε τα νεκρά πέτρες",
+                "fr": "Marquez les pierres mortes",
+                "hi": "मृत पत्थर मार्क",
+                "es": "Marcar las piedras muertas"
+            },
             "OPPONENT_CHOOSE_BOARD_SIZE": {
                 "en": "Opponent is choosing the board size, and making the first move.",
                 "iw": "יריב הוא בחירת גודל הלוח, ועושה את הצעד הראשון.",
@@ -85,7 +125,16 @@ var game;
                 "hi": "पुष्टि करें",
                 "es": "CONFIRMAR"
             },
-           
+            "PASS": {
+                "en": "PASS",
+                "iw": "עבור",
+                "pt": "passo",
+                "zh": "我通过移动",
+                "el": "Έχω περάσει την κίνηση",
+                "fr": "Je passe le déménagement",
+                "hi": "मैं इस कदम से पारित",
+                "es": "Paso el movimiento"
+            },
             "END_GAME": {
                 "en": "END GAME",
                 "iw": "סיים משחק",
@@ -96,7 +145,26 @@ var game;
                 "hi": "मैं खेल खत्म",
                 "es": "Termino el juego"
             },
-            
+            "SELECT_DEAD": {
+                "en": "Select dead",
+                "iw": "בחר מתים",
+                "pt": "Selecione mortos",
+                "zh": "选择死",
+                "el": "Επιλέξτε νεκρούς",
+                "fr": "Sélectionnez morts",
+                "hi": "मृत का चयन करें",
+                "es": "Seleccionar muertos"
+            },
+            "AGREE": {
+                "en": "Agree",
+                "iw": "לְהַסכִּים",
+                "pt": "concordar",
+                "zh": "同意",
+                "el": "Συμφωνώ",
+                "fr": "Se mettre d'accord",
+                "hi": "इस बात से सहमत",
+                "es": "De acuerdo"
+            },
             "CONTINUE_PLAYING": {
                 "en": "Continue playing",
                 "iw": "המשך משחק",
@@ -108,14 +176,14 @@ var game;
                 "es": "Sigue jugando"
             },
             "GAME_OVER": {
-                "en": "Game over! Black: {{BLACK_SCORE}}   White: {{WHITE_SCORE}}",
-                "iw": "סוף המשחק! שחור: {{BLACK_SCORE}}   לבן: {{WHITE_SCORE}}",
-                "pt": "Fim de jogo! Preto: {{BLACK_SCORE}}   White: {{WHITE_SCORE}}",
-                "zh": "游戏结束！黑色：{{BLACK_SCORE}}   白{{WHITE_SCORE}}",
-                "el": "Τέλος παιχνιδιού! Μαύρο: {{BLACK_SCORE}}   Λευκά: {{WHITE_SCORE}}",
-                "fr": "Jeu terminé! Noir: {{BLACK_SCORE}}   Blanc: {{WHITE_SCORE}}",
-                "hi": "खेल खत्म! ब्लैक: {{BLACK_SCORE}}   व्हाइट: {{WHITE_SCORE}}",
-                "es": "¡Juego terminado! Negro: {{BLACK_SCORE}}   blanco: {{WHITE_SCORE}}"
+                "en": "Game over! Black: {{BLACK_SCORE}}, White: {{WHITE_SCORE}}",
+                "iw": "סוף המשחק! שחור: {{BLACK_SCORE}}, לבן: {{WHITE_SCORE}}",
+                "pt": "Fim de jogo! Preto: {{BLACK_SCORE}}, White: {{WHITE_SCORE}}",
+                "zh": "游戏结束！黑色：{{BLACK_SCORE}}，白{{WHITE_SCORE}}",
+                "el": "Τέλος παιχνιδιού! Μαύρο: {{BLACK_SCORE}}, Λευκά: {{WHITE_SCORE}}",
+                "fr": "Jeu terminé! Noir: {{BLACK_SCORE}}, Blanc: {{WHITE_SCORE}}",
+                "hi": "खेल खत्म! ब्लैक: {{BLACK_SCORE}}, व्हाइट: {{WHITE_SCORE}}",
+                "es": "¡Juego terminado! Negro: {{BLACK_SCORE}}, blanco: {{WHITE_SCORE}}"
             }
         };
     }
@@ -158,7 +226,6 @@ var game;
         return boardStr;
     }
     game.getStateForOgImage = getStateForOgImage;
-
     function showContinuePlayingOrAgreeButtons() {
         return isMyTurn();
     }
@@ -167,10 +234,9 @@ var game;
         if (!showContinuePlayingOrAgreeButtons())
             return;
         log.info("continuePlayingClicked");
-        game.score = { white: " ", black: " " };
+        game.score = { white: 0, black: 0 };
     }
     game.continuePlayingClicked = continuePlayingClicked;
-
     function showConfirmButton() {
         return game.moveToConfirm != null;
     }
@@ -178,11 +244,9 @@ var game;
     function confirmClicked() {
         if (!showConfirmButton())
             return;
-       // log.info("confirmClicked, passes=", " moveToConfirm=", game.moveToConfirm);
         cellClicked(game.moveToConfirm.row, game.moveToConfirm.col);
-            clearClickToDrag();
-            game.moveToConfirm = null;
-        
+        clearClickToDrag();
+        game.moveToConfirm = null;
     }
     game.confirmClicked = confirmClicked;
     function showModal(titleId, bodyId) {
@@ -223,7 +287,7 @@ var game;
         if (!isHumanTurn()) {
             return; // if the game is over, do not display dragging effect
         }
-        if (type === "touchstart" && game.moveToConfirm != null && game.deadBoard == null) {
+        if (type === "touchstart" && game.moveToConfirm != null) {
             game.moveToConfirm = null;
             game.$rootScope.$apply();
         }
@@ -244,7 +308,7 @@ var game;
             clearClickToDrag();
             return;
         }
-        clickToDragPiece.style.display =  "inline";
+        clickToDragPiece.style.display = "inline";
         draggingLines.style.display = "inline";
         var centerXY = getSquareCenterXY(row, col);
         verticalDraggingLine.setAttribute("x1", "" + centerXY.x);
@@ -285,11 +349,9 @@ var game;
     }
     function dragDone(row, col) {
         game.$rootScope.$apply(function () {
-        game.moveToConfirm = { row: row, col: col };
+            game.moveToConfirm = { row: row, col: col };
         });
     }
-
-
     function setDim(d) {
         game.dim = d;
         game.hasDim = true;
@@ -311,6 +373,7 @@ var game;
         var count = game.proposals[row][col];
         if (count == 0)
             return {};
+        // proposals[row][col] is > 0
         var countZeroBased = count - 1;
         var maxCount = game.currentUpdateUI.numberOfPlayersRequiredToMove - 2;
         var ratio = maxCount == 0 ? 1 : countZeroBased / maxCount; // a number between 0 and 1 (inclusive).
@@ -336,9 +399,6 @@ var game;
             game.proposals[delta_1.row][delta_1.col]++;
         }
     }
-	 
-
-    // update UI
     function updateUI(params) {
         log.info("Game got updateUI:", params);
         game.didMakeMove = false; // Only one move per updateUI
@@ -354,7 +414,7 @@ var game;
                 return;
         }
         game.currentUpdateUI = params;
-        game.score = { white: " ", black: " " };
+        game.score = { white: 0, black: 0 };
         clearClickToDrag();
         game.moveToConfirm = null;
         if (isFirstMove()) {
@@ -379,10 +439,8 @@ var game;
             game.$timeout(maybeSendComputerMove, 500);
         }
     }
-
-
     function calcScore() {
-        game.score = { white: " ", black: " " };
+        game.score = { white: 0, black: 0 };
         var liveBoard = angular.copy(game.board);
         var emptyBoard = gameLogic.createNewBoard(game.dim); // has 'W' in all empty places.
         for (var row = 0; row < game.dim; row++) {
@@ -391,31 +449,31 @@ var game;
                     emptyBoard[row][col] = 'W';
             }
         }
-        var emptySets = [];
+        /*
+       // for (let set of sets.white) score.white += set.length;
+        //for (let set of sets.black) score.black += set.length;
+        let emptySets = null;
         // For each empty group, decide if it's surrounded by black/white/both.
-        for (var _d = 0, emptySets_1 = emptySets; _d < emptySets_1.length; _d++) {
-            var emptySet = emptySets_1[_d];
-            var neighborColor = '';
-            for (var _e = 0, emptySet_1 = emptySet; _e < emptySet_1.length; _e++) {
-                var point = emptySet_1[_e];
-                var row = point[0];
-                var col = point[1];
-                neighborColor = updateColor(row - 1 >= 0 ? liveBoard[row - 1][col] : '', neighborColor);
-                neighborColor = updateColor(row + 1 < game.dim ? liveBoard[row + 1][col] : '', neighborColor);
-                neighborColor = updateColor(col - 1 >= 0 ? liveBoard[row][col - 1] : '', neighborColor);
-                neighborColor = updateColor(col + 1 < game.dim ? liveBoard[row][col + 1] : '', neighborColor);
-                if (neighborColor == 'Both')
-                    break;
-            }
+        for (let emptySet of emptySets) {
+          let neighborColor: string = '';
+          for (let point of emptySet) {
+            let row = point[0];
+            let col = point[1];
+            neighborColor = updateColor(row - 1 >= 0 ? liveBoard[row - 1][col] : '', neighborColor);
+            neighborColor = updateColor(row + 1 < dim ? liveBoard[row + 1][col] : '', neighborColor);
+            neighborColor = updateColor(col - 1 >= 0 ? liveBoard[row][col - 1] : '', neighborColor);
+            neighborColor = updateColor(col + 1 < dim ? liveBoard[row][col + 1] : '', neighborColor);
+            if (neighborColor == 'Both') break;
+          }
+         // if (neighborColor == 'W') score.white += emptySet.length;
+          //else if (neighborColor == 'B') score.black += emptySet.length;
         }
+        */
     }
     game.calcScore = calcScore;
     function updateColor(color, neighborColor) {
         return color == '' ? neighborColor : (neighborColor == color || neighborColor == '' ? color : 'Both');
     }
-
-
-    //play with computer
     function maybeSendComputerMove() {
         if (!isComputerTurn())
             return;
@@ -429,16 +487,14 @@ var game;
         }
         game.didMakeMove = true;
         var delta = move.state.delta;
-        var chatDescription =  indexToLetter(delta.col) + indexToNumber(delta.row);
+        var chatDescription = indexToLetter(delta.col) + indexToNumber(delta.row);
         if (!game.proposals) {
             gameService.makeMove(move, null, chatDescription);
-          
         }
         else {
             var myProposal = {
                 data: {
                     delta: delta,
-                    deadBoard: move.state.deadBoard,
                 },
                 playerInfo: game.yourPlayerInfo,
             };
@@ -448,13 +504,10 @@ var game;
             }
             else {
                 var chosenDeadBoardProposal = gameLogic.createNewBoardWithElement(game.dim, false);
-				console.warn("Make A Move! ");
             }
             gameService.makeMove(move, myProposal, chatDescription);
         }
     }
-
-
     function isFirstMove() {
         return !game.currentUpdateUI.state;
     }
@@ -486,25 +539,22 @@ var game;
         game.moveToConfirm = { row: -1, col: -1 };
         clearClickToDrag();
     }
-   
-
+    game.passClicked = passClicked;
     function getButtonValue() {
-      if (game.currentUpdateUI.endMatchScores) {
-        if (game.currentUpdateUI.endMatchScores[0] === 1 && game.currentUpdateUI.endMatchScores[1] === 0) { 
-            game.score.black = "Win, Give me five!";
-            game.score.white = "Lose";
-          return translate('GAME_OVER', { BLACK_SCORE: '' + game.score.black, WHITE_SCORE: '' + game.score.white });
+        if (game.currentUpdateUI.endMatchScores) {
+            if (game.currentUpdateUI.endMatchScores[0] === 1 && game.currentUpdateUI.endMatchScores[1] === 0) {
+                game.score.black = 1;
+                game.score.white = 0;
+                return translate('GAME_OVER', { BLACK_SCORE: '' + game.score.black, WHITE_SCORE: '' + game.score.white });
+            }
+            if (game.currentUpdateUI.endMatchScores[1] === 1) {
+                game.score.black = 0;
+                game.score.white = 1;
+                return translate('GAME_OVER', { BLACK_SCORE: '' + game.score.black, WHITE_SCORE: '' + game.score.white });
+            }
         }
-        if (game.currentUpdateUI.endMatchScores[1] === 1) { 
-            game.score.black = "Lose";
-            game.score.white = "Win, Give me five";
-          return translate('GAME_OVER', { BLACK_SCORE: '' + game.score.black, WHITE_SCORE: '' + game.score.white });
-        }
-      }
     }
     game.getButtonValue = getButtonValue;
-
-
     function cellClicked(rrow, ccol) {
         log.log(["Clicked on cell:", rrow, ccol]);
         if (!isHumanTurn()) {
